@@ -1,5 +1,3 @@
-"""Small PostgreSQL helper layer for the personal finance application."""
-
 from __future__ import annotations
 
 import os
@@ -11,18 +9,20 @@ import streamlit as st
 
 
 def get_database_url() -> str:
-    """Read the PostgreSQL connection string from Streamlit secrets or environment variables."""
+
     try:
         url = st.secrets["database"]["url"]
     except Exception:
         url = os.environ.get("DATABASE_URL", "")
     if not url:
-        raise RuntimeError("Database URL is not configured.")
+        raise RuntimeError(
+            "DATABASE_URL is not configured. Add it to .streamlit/secrets.toml."
+        )
     return url
 
 
 def get_connection():
-    """Open a PostgreSQL connection."""
+    
     return psycopg2.connect(get_database_url(), cursor_factory=RealDictCursor)
 
 
@@ -43,3 +43,12 @@ def execute(sql: str, params: tuple[Any, ...] = ()) -> None:
         with conn.cursor() as cur:
             cur.execute(sql, params)
         conn.commit()
+
+
+def execute_returning(sql: str, params: tuple[Any, ...] = ()) -> dict[str, Any] | None:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql, params)
+            row = cur.fetchone()
+        conn.commit()
+        return row

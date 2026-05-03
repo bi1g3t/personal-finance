@@ -1,5 +1,3 @@
-"""Password hashing helpers for the personal finance application."""
-
 import hashlib
 import hmac
 import os
@@ -13,7 +11,9 @@ def hash_password(password: str, salt: bytes | None = None) -> str:
         raise ValueError("Password must not be empty.")
     if salt is None:
         salt = os.urandom(16)
-    digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, ITERATIONS)
+    digest = hashlib.pbkdf2_hmac(
+        "sha256", password.encode("utf-8"), salt, ITERATIONS
+    )
     return f"pbkdf2_sha256${ITERATIONS}${salt.hex()}${digest.hex()}"
 
 
@@ -25,7 +25,9 @@ def verify_password(password: str, stored_hash: str) -> bool:
             return False
         salt = bytes.fromhex(salt_hex)
         expected = bytes.fromhex(digest_hex)
-        actual = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, int(iterations))
+        actual = hashlib.pbkdf2_hmac(
+            "sha256", password.encode("utf-8"), salt, int(iterations)
+        )
         return hmac.compare_digest(actual, expected)
     except Exception:
         return False
