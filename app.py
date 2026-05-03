@@ -10,7 +10,6 @@ from db import execute, execute_returning, fetch_all, fetch_one
 
 st.set_page_config(
     page_title="Personal Finance Simulation Platform",
-    page_icon="💰",
     layout="wide",
 )
 
